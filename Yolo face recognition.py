@@ -26,7 +26,7 @@ class FaceRecognition:
     def encode_faces(self):
         for image in os.listdir('faces'):
             face_image=face_recognition.load_image_file(f'faces/{image}')
-            face_encoding=face_recognition.face_encodings(face_image)[0]
+            face_encoding=face_recognition.face_encodings(face_image,num_jitters=50)[0]
 
             self.known_face_encodings.append(face_encoding)
             self.known_face_names.append(image)
@@ -58,7 +58,7 @@ class FaceRecognition:
 
 
     def run_recognition(self):
-        model = torch.hub.load('yolov5-master', 'custom', source='local', path='yolov5-master/face3.pt')
+        model = torch.hub.load('/home/yosef/yosef/Final project/yolov5-master', 'custom', source='local', path='face3.pt')
         cam = cv2.VideoCapture(0)
         if not cam.isOpened():
             sys.exit('Video source not found')
@@ -74,7 +74,7 @@ class FaceRecognition:
                 self.face_encodings =face_recognition.face_encodings(frame,self.face_locations)
                 self.face_names = []
                 for face_encoding in self.face_encodings:
-                    matches = face_recognition.compare_faces(self.known_face_encodings,face_encoding)
+                    matches = face_recognition.compare_faces(self.known_face_encodings,face_encoding,tolerance=0.65)
                     name = 'Unknown'
                     confidence = 'Unknown'
 
@@ -103,7 +103,7 @@ class FaceRecognition:
 
 if __name__=='__main__':
 
-    detector = torch.hub.load('yolov5-master', 'custom', source='local', path='yolov5-master/face3.pt')
+    # detector = torch.hub.load('yolov5-master', 'custom', source='local', path='yolov5-master/face3.pt')
     fr = FaceRecognition()
     fr.encode_faces()
     fr.run_recognition()
